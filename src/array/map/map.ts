@@ -1,67 +1,81 @@
 /**
- * Extends the global Array interface to add a custom map method.
- * This declaration tells TypeScript that arrays have an additional
- * method called 'customMap' with the specified signature.
+ * customMap - A custom implementation of the Array.prototype.map method
+ *
+ * Creates a new array populated with the results of calling a provided function
+ * on every element in the calling array. This implementation maintains the same
+ * behavior as the native map method, including proper handling of sparse arrays
+ * and the thisArg parameter.
+ *
+ * @template T - The type of elements in the source array
+ * @template U - The type of elements in the resulting array
+ *
+ * @param {function(T, number, T[]): U} callback - Function that produces an element of the new array
+ *        taking three arguments:
+ *        - currentValue (T): The current element being processed
+ *        - index (number): The index of the current element
+ *        - array (T[]): The array customMap was called upon
+ *
+ * @param {any} [thisArg] - Value to use as 'this' when executing the callback.
+ *        If omitted, undefined is used as the this value. For arrow functions,
+ *        thisArg has no effect as arrow functions establish 'this' lexically.
+ *
+ * @returns {U[]} A new array with each element being the result of the callback function
+ *
+ * @example
+ * // Double all numbers in an array
+ * [1, 2, 3].customMap(x => x * 2); // [2, 4, 6]
+ *
+ * @example
+ * // Using thisArg parameter
+ * const multiplier = { factor: 10 };
+ * [1, 2, 3].customMap(function(x) { return x * this.factor; }, multiplier); // [10, 20, 30]
+ *
+ * @example
+ * // Handling sparse arrays
+ * [1, , 3].customMap(x => x * 2); // [2, <empty>, 6]
+ *
+ * @throws {TypeError} If callback is not a function
  */
 declare global {
   interface Array<T> {
-    /**
-     * Custom implementation of the map method to transform array elements.
-     *
-     * @param callback - Function to execute on each element in the array
-     * @returns A new array with each element being the result of the callback function
-     */
-    customMap<U>(callback: (value: T, index: number, array: T[]) => U): U[];
+    customMap<U>(
+      callback: (value: T, index: number, array: T[]) => U,
+      thisArg?: any
+    ): U[];
   }
 }
 
-/**
- * Implementation of the customMap method on the Array prototype.
- * This follows the same behavior as the native Array.prototype.map method
- * but is implemented as a custom method.
- *
- * @param callback - Function that produces an element of the new array, taking three arguments:
- *                  - value: Current element being processed in the array
- *                  - index: Index of the current element being processed
- *                  - array: The array customMap was called upon
- * @returns A new array with each element being the result of the callback function
- */
 Array.prototype.customMap = function <T, U>(
-  callback: (value: T, index: number, array: T[]) => U
+  callback: (value: T, index: number, array: T[]) => U,
+  thisArg?: any
 ): U[] {
-  // Create a new array for the mapped values, preserving the type transformation from T to U
-  const newArr: U[] = [];
-
-  // Cast 'this' to an array of T. This is required since 'this' inside a prototype method
-  // refers to the array instance that the method is called on
-  const currentArray = this as T[];
-
-  // Cache the array length for slight performance improvement
-  const length: number = currentArray.length;
-
-  // Loop through each item in the original array
-  for (let index = 0; index < length; index++) {
-    // Apply the callback function to the current item and store the result
-    // The callback gets three arguments: current value, current index, and the whole array
-    const currentItem: U = callback(currentArray[index], index, currentArray);
-
-    // Add the transformed item to our new result array
-    newArr.push(currentItem);
+  // Check if callback is actually a function
+  if (typeof callback !== "function") {
+    throw new TypeError(`${callback} is not a function`);
   }
 
-  // Return the new array with all transformed values
-  // This preserves functional programming principles by not mutating the original array
+  // Initialize new array with same length to maintain sparse structure
+  const newArr = new Array(this.length) as U[];
+
+  const currentArray = this as T[];
+  const length: number = currentArray.length;
+
+  for (let index = 0; index < length; index++) {
+    // Skip holes in sparse arrays (just like native map)
+    if (index in currentArray) {
+      // Use call() to invoke the callback with the specified thisArg context
+      const currentItem: U = callback.call(
+        thisArg,
+        currentArray[index],
+        index,
+        currentArray
+      );
+
+      // Assign to the same index to maintain sparse structure
+      newArr[index] = currentItem;
+    }
+    // No else branch is needed - not assigning to an index preserves the hole
+  }
+
   return newArr;
 };
-
-/**
- * Example usage:
- *
- * const numbers = [1, 2, 3, 4, 5];
- * const doubled = numbers.customMap(num => num * 2);
- * console.log(doubled); // [2, 4, 6, 8, 10]
- *
- * const names = ["Alice", "Bob", "Charlie"];
- * const greetings = names.customMap(name => `Hello, ${name}!`);
- * console.log(greetings); // ["Hello, Alice!", "Hello, Bob!", "Hello, Charlie!"]
- */
