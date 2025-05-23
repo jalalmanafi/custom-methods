@@ -1,7 +1,5 @@
 import typescriptLogo from "./typescript.svg";
 
-import "./array/filter/filter";
-
 import "./style.css";
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `

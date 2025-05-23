@@ -35,9 +35,3 @@ Array.prototype.customFilter = function <T>(
 
   return newArr;
 };
-
-const nums = ["Jalal", "Sahil"];
-
-const res = nums.customFilter((item) => item === "Sahil");
-
-console.log(res);
