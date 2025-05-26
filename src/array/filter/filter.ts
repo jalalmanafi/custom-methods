@@ -1,5 +1,4 @@
 /**
- * Custom Array Filter Extension
  *
  * This module extends the native Array prototype with a custom filter implementation
  * that replicates the behavior of the standard Array.filter() method. The implementation
