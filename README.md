@@ -95,28 +95,30 @@ const users = [{id: 1, name: 'John'}, {id: 2, name: 'Jane'}];
 const user = users.customFind(u => u.id === 2); // {id: 2, name: 'Jane'}
 ```
 
+### Object Methods *(Planned)*
+
+- `customKeys()`
+- `customValues()`
+- `customEntries()`
+- `customHasOwnProperty()`
+
 ## 🧪 Testing
 
-The project includes comprehensive test suites using Vitest:
+The project includes comprehensive unit test suites using Vitest:
 
 ```bash
-# Run tests
+# Run all tests
 npm test
-
-# Run tests with UI
-npm run test:ui
-
-# Run tests in watch mode
-npm run test:watch
 ```
 
 ### Test Coverage
 
-- ✅ Behavior comparison with native methods
-- ✅ Edge cases (empty arrays, sparse arrays, etc.)
-- ✅ Type safety verification
-- ✅ Performance benchmarks
-- ✅ Error handling
+- ✅ **Unit Tests**: Individual method functionality and behavior verification
+- ✅ **Behavior Comparison**: Direct comparison with native methods
+- ✅ **Edge Cases**: Empty arrays, sparse arrays, null/undefined handling
+- ✅ **Type Safety**: TypeScript generic constraints verification
+- ✅ **Performance Benchmarks**: Speed comparison with native implementations
+- ✅ **Error Handling**: Proper error throwing and handling
 
 ## 🔧 Development
 
@@ -201,15 +203,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
 - [Vite Documentation](https://vitejs.dev/)
 - [Vitest Documentation](https://vitest.dev/)
-
-## 🏆 Goals
-
-- [ ] Implement all major array methods
-- [ ] Add object methods
-- [ ] Create performance benchmarks
-- [ ] Add interactive documentation
-- [ ] Publish as npm package
-- [ ] Create tutorial series
 
 ---
 
